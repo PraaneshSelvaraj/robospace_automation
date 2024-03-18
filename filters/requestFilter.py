@@ -1,4 +1,5 @@
 from pydantic import BaseModel, validator
+from typing import Optional
 
 class EmptyValidator:
     @validator("*", pre=True)
@@ -18,3 +19,7 @@ class RegisterFilter(BaseModel, EmptyValidator):
 class RFIDRegister(BaseModel, EmptyValidator):
     register_no : str
     rfid : str
+
+class Entry(BaseModel):
+    rfid: Optional[str] = None
+    register_no: Optional[str] = None

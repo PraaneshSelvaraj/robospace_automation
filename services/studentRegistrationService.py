@@ -7,7 +7,7 @@ from fastapi import status
 mongoUtil = mongoDB.MongoUtil()
 
 async def registerUser(student : RegisterFilter):
-    existingStudent = mongoUtil.getStudent(student.register_no)
+    existingStudent = mongoUtil.getStudent(register_no=student.register_no)
     if existingStudent:
         return JSONResponse(content={"message" : f"Student with register: {student.register_no} already exists.", "data" : {}},status_code=status.HTTP_409_CONFLICT)
     
@@ -19,7 +19,7 @@ async def registerUser(student : RegisterFilter):
     return {"message" : f"{student['register_no']} registered successfully."}
 
 async def registerRfid(rfid : RFIDRegister):
-    student = mongoUtil.getStudent(rfid.register_no)
+    student = mongoUtil.getStudent(register_no=rfid.register_no)
     if student is None:
         return JSONResponse(content={"message" : f"Unable to find student {rfid.register_no}", "data" : {}}, status_code=status.HTTP_404_NOT_FOUND)
     

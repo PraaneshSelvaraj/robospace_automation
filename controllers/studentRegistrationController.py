@@ -10,6 +10,6 @@ router = APIRouter()
 async def registerUser(student : RegisterFilter):
     return await studentRegistrationService.registerUser(student)
 
-@router.put('/rfid/register', status_code=status.HTTP_201_CREATED, response_model=responseFilter.Response)
+@router.put('/rfid/register', status_code=status.HTTP_200_OK, response_model=responseFilter.Response)
 async def registerRfid(rfid : RFIDRegister):
     return await studentRegistrationService.registerRfid(rfid)

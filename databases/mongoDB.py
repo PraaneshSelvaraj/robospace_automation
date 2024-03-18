@@ -9,12 +9,17 @@ class MongoUtil:
         self._connection = MongoClient(MONGO_URL)
         self._db = self._connection[DATABASE]
         self._studentsCollection = self._db.students
+        self._logsCollection = self._db.logs
 
-    def getStudent(self,register_no : str) -> dict:
+    def getStudent(self,register_no : str = None, rfid : str = None) -> dict:
         try:
-            user = self._studentsCollection.find_one({"register_no" : register_no})
-            user.pop("_id", None)
-            return user
+            if register_no:
+                student = self._studentsCollection.find_one({"register_no" : register_no})
+            elif rfid:
+                student = self._studentsCollection.find_one({"rfid" : rfid})
+                
+            student.pop("_id", None)
+            return student
         
         except: return None
         
@@ -28,6 +33,14 @@ class MongoUtil:
     def updateRFID(self, register_no : str, rfid : str) -> bool:
         try:
             self._studentsCollection.update_one({"register_no" : register_no}, {"$set" : {"rfid" : rfid}})
+            return True
+        
+        except: return False
+
+    def entryLog(self, entryData : dict) -> bool:
+        
+        try:
+            self._logsCollection.insert_one(entryData)
             return True
         
         except: return False
