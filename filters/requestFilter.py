@@ -1,5 +1,6 @@
 from pydantic import BaseModel, validator
 from typing import Optional
+from datetime import datetime
 
 class EmptyValidator:
     @validator("*", pre=True)
@@ -27,3 +28,7 @@ class Entry(BaseModel):
 class Exit(BaseModel):
     rfid: Optional[str] = None
     register_no: Optional[str] = None
+
+class LogQuery(BaseModel):
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None

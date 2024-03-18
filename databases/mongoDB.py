@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import os
+import pytz
 
 MONGO_URL = os.getenv("MONGO_URL")
 DATABASE = os.getenv("DATABASE")
@@ -44,3 +45,29 @@ class MongoUtil:
             return True
         
         except: return False
+
+    def get_logs(self, start_date = None, end_date = None) -> list:
+        ist_timezone = pytz.timezone('Asia/Kolkata')
+        if end_date:
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+
+        if start_date is not None and end_date is not None:
+            logsResult = self._logsCollection.find({"datetime": {"$gte": start_date, "$lte": end_date}})
+
+        elif start_date is not None:
+            logsResult = self._logsCollection.find({"datetime": {"$gte": start_date}})
+
+        elif end_date is not None:
+            logsResult = self._logsCollection.find({"datetime": {"$lte": end_date}})
+
+        else:
+            logsResult = self._logsCollection.find()
+            
+        logs = []
+        
+        for log in logsResult:
+            log.pop("_id", None)
+            log["datetime"] = log["datetime"].replace(tzinfo=pytz.utc).astimezone(ist_timezone).strftime('%Y-%m-%dT%H:%M:%S.%f')
+            logs.append(log)
+
+        return logs
