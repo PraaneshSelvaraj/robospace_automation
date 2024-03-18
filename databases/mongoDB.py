@@ -24,3 +24,10 @@ class MongoUtil:
             return True
         
         except: return False
+
+    def updateRFID(self, register_no : str, rfid : str) -> bool:
+        try:
+            self._studentsCollection.update_one({"register_no" : register_no}, {"$set" : {"rfid" : rfid}})
+            return True
+        
+        except: return False
