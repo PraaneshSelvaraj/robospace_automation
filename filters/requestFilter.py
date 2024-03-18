@@ -23,3 +23,7 @@ class RFIDRegister(BaseModel, EmptyValidator):
 class Entry(BaseModel):
     rfid: Optional[str] = None
     register_no: Optional[str] = None
+
+class Exit(BaseModel):
+    rfid: Optional[str] = None
+    register_no: Optional[str] = None

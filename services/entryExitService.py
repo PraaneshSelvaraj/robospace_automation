@@ -1,4 +1,4 @@
-from filters.requestFilter import Entry
+from filters.requestFilter import Entry, Exit
 from fastapi.responses import JSONResponse
 from fastapi import status
 from databases import mongoDB
@@ -41,3 +41,25 @@ async def entry(data : Entry):
 
         else:
             return JSONResponse(content={'message' : "Access Denied", "data" : {}}, status_code=status.HTTP_403_FORBIDDEN)
+        
+async def exitOut(data : Exit):
+    if data.rfid is None and data.register_no is None:
+        return JSONResponse(content={"message" : "'rfid' or 'register_no' must be provided.", "data" : ""}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    
+    student = None
+
+    if data.rfid:
+        student = mongoUtil.getStudent(rfid=data.rfid)
+    elif data.register_no:
+        student = mongoUtil.getStudent(register_no=data.register_no)
+
+    if student is None:
+        return JSONResponse(content={"message" : f"Unable to find student", "data" : {}}, status_code=status.HTTP_404_NOT_FOUND)
+    
+    entryData = {}
+    entryData['register_no'] = student['register_no']
+    entryData['datetime'] = dateTimeUtil.get_current_ist_time()
+    entryData['state'] = 'exit'
+    mongoUtil.entryLog(entryData)
+
+    return {"message" : "Validation successfull"}
