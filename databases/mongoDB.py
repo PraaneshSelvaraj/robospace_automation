@@ -11,6 +11,7 @@ class MongoUtil:
         self._db = self._connection[DATABASE]
         self._studentsCollection = self._db.students
         self._logsCollection = self._db.logs
+        self._adminsCollection = self._db.admins
 
     def getStudent(self,register_no : str = None, rfid : str = None) -> dict:
         try:
@@ -71,3 +72,20 @@ class MongoUtil:
             logs.append(log)
 
         return logs
+    
+    def getAdmin(self, username : str) -> dict:
+        try:
+            
+            student = self._adminsCollection.find_one({"username" : username})
+                
+            student.pop("_id", None)
+            return student
+        
+        except: return None
+
+    def addAdmin(self, admin : dict) -> bool:
+        try:
+            self._adminsCollection.insert_one(admin)
+            return True
+        
+        except: return False

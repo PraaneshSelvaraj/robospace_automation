@@ -32,3 +32,9 @@ class Exit(BaseModel):
 class LogQuery(BaseModel):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
+
+class AdminRegisterFilter(BaseModel, EmptyValidator):
+    username : str
+    password : str
+    check_password : str
+    admin_type : str
