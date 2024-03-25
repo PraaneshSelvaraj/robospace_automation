@@ -1,13 +1,21 @@
 from filters.requestFilter import Entry, Exit
 from fastapi.responses import JSONResponse
-from fastapi import status
+from fastapi import status, Depends
 from databases import mongoDB
-from utils import dateTimeUtil
+from utils import dateTimeUtil, authentication, jwtUtil
 import config
 
 mongoUtil = mongoDB.MongoUtil()
 
-async def entry(data : Entry):
+async def entry(data : Entry, token: str = Depends(authentication.oauth2_scheme)):
+    jwtData = jwtUtil.get_jwt_data(token)
+    adminUser = mongoUtil.getAdmin(username=jwtData['user'])
+    if adminUser is None:
+        return JSONResponse(content={"message" : "Not Authorized.", "data" : ""}, status_code=status.HTTP_401_UNAUTHORIZED)
+
+    if adminUser['admin_type'] != 'device':
+        return JSONResponse(content={"message" : "Not Authorized. Must be a device", "data" : ""}, status_code=status.HTTP_401_UNAUTHORIZED)
+
     if data.rfid is None and data.register_no is None:
         return JSONResponse(content={"message" : "'rfid' or 'register_no' must be provided.", "data" : ""}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
     
@@ -42,7 +50,15 @@ async def entry(data : Entry):
         else:
             return JSONResponse(content={'message' : "Access Denied", "data" : {}}, status_code=status.HTTP_403_FORBIDDEN)
         
-async def exitOut(data : Exit):
+async def exitOut(data : Exit, token: str = Depends(authentication.oauth2_scheme)):
+    jwtData = jwtUtil.get_jwt_data(token)
+    adminUser = mongoUtil.getAdmin(username=jwtData['user'])
+    if adminUser is None:
+        return JSONResponse(content={"message" : "Not Authorized.", "data" : ""}, status_code=status.HTTP_401_UNAUTHORIZED)
+
+    if adminUser['admin_type'] != 'device':
+        return JSONResponse(content={"message" : "Not Authorized. Must be a device", "data" : ""}, status_code=status.HTTP_401_UNAUTHORIZED)
+    
     if data.rfid is None and data.register_no is None:
         return JSONResponse(content={"message" : "'rfid' or 'register_no' must be provided.", "data" : ""}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
     

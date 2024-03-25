@@ -9,6 +9,6 @@ def create_jwt_token(data: dict):
     jwtToken = jwt.encode(data, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
     return jwtToken
 
-def get_jwt_data(token):
+def get_jwt_data(token: str):
     payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
     return payload
